@@ -12,10 +12,12 @@ export default function MainLayout() {
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         <Navbar />
         
-        {/* Scrollable Content */}
-        <main className="flex-1 overflow-y-auto w-full max-w-[1200px] mx-auto px-6 py-8">
-          <Outlet />
-        </main>
+        {/* Scrollable Content — scrollbar now spans the full right column */}
+        <div className="flex-1 overflow-y-auto">
+          <main className="w-full max-w-[1200px] mx-auto px-6 py-8">
+            <Outlet />
+          </main>
+        </div>
       </div>
     </div>
   );
