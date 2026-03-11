@@ -183,7 +183,7 @@ export default function NoteEditor() {
         return (
           <div className="relative font-sans h-full">
             <textarea
-              className="w-full h-full min-h-[500px] bg-transparent outline-none resize-none text-lg leading-relaxed text-foreground placeholder:text-muted-foreground/60"
+              className="w-full h-full min-h-[500px] bg-transparent outline-none resize-none text-lg leading-relaxed text-foreground dark:text-zinc-100 placeholder:text-muted-foreground/50 dark:placeholder:text-zinc-500"
               placeholder='Start typing here... or press "/" for commands'
               value={content}
               onChange={(e) => setContent(e.target.value)}
@@ -227,49 +227,55 @@ export default function NoteEditor() {
 
   return (
     <div className="flex flex-col md:flex-row h-[calc(100vh-4rem-2rem)] shrink-0 gap-6 animate-in fade-in duration-300">
-      <div className="flex-1 flex flex-col h-full bg-background relative max-w-4xl mx-auto w-full">
-        
-        {/* Editor Toolbar & Header */}
-        <div className="flex items-start justify-between mb-8 sticky top-0 py-4 bg-background z-10">
-          <div className="w-full max-w-2xl">
-            <span className="text-xs font-medium text-muted-foreground bg-secondary px-2 py-0.5 rounded px-1.5 uppercase tracking-wider mb-2 inline-block">
-              {noteType} Note
-            </span>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Note Title"
-              className="w-full text-4xl font-bold bg-transparent outline-none placeholder:text-muted-foreground/40 mt-1 focus:placeholder:text-muted-foreground/20 transition-colors"
-            />
-          </div>
+      {/* Note Editor Card */}
+      <div className="flex-1 flex flex-col h-full max-w-4xl mx-auto w-full">
+        {/* Frosted glass card with glow */}
+        <div className="flex-1 flex flex-col rounded-2xl bg-white/85 dark:bg-zinc-900/80 backdrop-blur-sm shadow-xl shadow-primary/5 dark:shadow-primary/10 ring-1 ring-primary/10 dark:ring-primary/20 overflow-hidden">
 
-          <div className="flex flex-col items-end gap-2">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleDelete}
-                className="p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive rounded-md transition-colors"
-                title="Delete note"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={isSaving}
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md font-medium text-sm hover:bg-primary/90 transition-colors disabled:opacity-50"
-              >
-                <Save className="w-4 h-4" />
-                {isSaving ? "Saving..." : "Save Note"}
-              </button>
+          {/* Editor Toolbar & Header */}
+          <div className="flex items-start justify-between px-8 py-6 border-b border-border/50 sticky top-0 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm z-10 rounded-t-2xl">
+            <div className="w-full max-w-2xl">
+              <span className="text-xs font-medium text-muted-foreground bg-secondary px-2 py-0.5 rounded uppercase tracking-wider mb-2 inline-block">
+                {noteType} Note
+              </span>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Note Title"
+                className="w-full text-4xl font-bold bg-transparent outline-none placeholder:text-muted-foreground/40 mt-1 focus:placeholder:text-muted-foreground/20 transition-colors"
+              />
+            </div>
+
+            <div className="flex flex-col items-end gap-2 ml-4 pt-6">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleDelete}
+                  className="p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive rounded-md transition-colors"
+                  title="Delete note"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md font-medium text-sm hover:bg-primary/90 transition-colors disabled:opacity-50"
+                >
+                  <Save className="w-4 h-4" />
+                  {isSaving ? "Saving..." : "Save Note"}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Content Area */}
-        <div className="flex-1 overflow-y-auto pb-20 custom-scrollbar pr-2">
-          {renderEditorContent()}
+          {/* Content Area */}
+          <div className="flex-1 overflow-y-auto px-8 py-6 custom-scrollbar">
+            {renderEditorContent()}
+          </div>
+
         </div>
       </div>
+
 
       {/* AI Tools Panel (Right Sidebar) */}
       <div className="hidden lg:block">

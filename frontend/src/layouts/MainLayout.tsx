@@ -3,6 +3,8 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import StarField from "../components/StarField";
+import LightGradient from "../components/LightGradient";
+import CursorRipple from "../components/CursorRipple";
 
 export default function MainLayout() {
   const [isDark, setIsDark] = useState(
@@ -19,8 +21,10 @@ export default function MainLayout() {
 
   return (
     <div className="h-screen flex overflow-hidden bg-background text-foreground relative">
-      {/* Star field — dark mode only */}
-      {isDark && <StarField />}
+      {/* Animated backgrounds */}
+      {isDark  && <StarField />}
+      {!isDark && <LightGradient />}
+      {!isDark && <CursorRipple />}
 
       {/* Sidebar Navigation */}
       <Sidebar />

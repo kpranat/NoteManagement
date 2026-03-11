@@ -15,7 +15,7 @@
   --color-secondary: #f4f4f5;
   --color-secondary-foreground: #18181b;
   --color-muted: #f4f4f5;
-  --color-muted-foreground: #71717a;
+  --color-muted-foreground: #52525b;
   --color-accent: #f4f4f5;
   --color-accent-foreground: #18181b;
   --color-destructive: #ef4444;
@@ -58,6 +58,19 @@
     font-family: var(--font-sans);
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* Solid card surfaces that pop above the gradient */
+  :root:not(.dark) [class*="rounded-xl"],
+  :root:not(.dark) [class*="rounded-2xl"],
+  :root:not(.dark) [class*="rounded-lg"] {
+    background-color: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(4px);
+  }
+
+  /* Hide native cursor in light mode — replaced by CursorRipple */
+  :root:not(.dark) * {
+    cursor: none !important;
   }
 }
 
@@ -158,6 +171,13 @@
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes meshGradient {
+  0%   { background-position: 0%   50%; }
+  25%  { background-position: 50%  100%; }
+  50%  { background-position: 100% 50%; }
+  75%  { background-position: 50%  0%; }
+  100% { background-position: 0%   50%; }
 }
 @keyframes slide-in-left {
   from { opacity: 0; transform: translateX(-10px); }
