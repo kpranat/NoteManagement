@@ -230,10 +230,10 @@ export default function NoteEditor() {
       {/* Note Editor Card */}
       <div className="flex-1 flex flex-col h-full max-w-4xl mx-auto w-full">
         {/* Frosted glass card with glow */}
-        <div className="flex-1 flex flex-col rounded-2xl bg-white/85 dark:bg-zinc-900/80 backdrop-blur-sm shadow-xl shadow-primary/5 dark:shadow-primary/10 ring-1 ring-primary/10 dark:ring-primary/20 overflow-hidden">
+        <div className="note-editor-card flex-1 flex flex-col rounded-2xl shadow-xl shadow-primary/5 ring-1 ring-primary/10 dark:ring-primary/20 overflow-hidden">
 
           {/* Editor Toolbar & Header */}
-          <div className="flex items-start justify-between px-8 py-6 border-b border-border/50 sticky top-0 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm z-10 rounded-t-2xl">
+          <div className="note-editor-header flex items-start justify-between px-8 py-6 border-b border-border/50 sticky top-0 z-10 rounded-t-2xl">
             <div className="w-full max-w-2xl">
               <span className="text-xs font-medium text-muted-foreground bg-secondary px-2 py-0.5 rounded uppercase tracking-wider mb-2 inline-block">
                 {noteType} Note

@@ -60,12 +60,28 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Solid card surfaces that pop above the gradient */
-  :root:not(.dark) [class*="rounded-xl"],
-  :root:not(.dark) [class*="rounded-2xl"],
-  :root:not(.dark) [class*="rounded-lg"] {
-    background-color: rgba(255, 255, 255, 0.88);
+  /* Frosted card surface for light mode only */
+  :root:not(.dark) .note-editor-card {
+    background-color: rgba(255, 255, 255, 0.90) !important;
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
+  }
+
+  /* Dark mode note editor card */
+  .dark .note-editor-card {
+    background-color: rgba(24, 24, 27, 0.85) !important;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+
+  /* Dark mode sticky header */
+  .dark .note-editor-header {
+    background-color: rgba(24, 24, 27, 0.95) !important;
+  }
+
+  /* Light mode sticky header */
+  :root:not(.dark) .note-editor-header {
+    background-color: rgba(255, 255, 255, 0.95) !important;
   }
 
   /* Hide native cursor in light mode — replaced by CursorRipple */
