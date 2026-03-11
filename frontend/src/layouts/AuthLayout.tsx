@@ -1,8 +1,14 @@
 import { Outlet, Link } from "react-router-dom";
+import ThemeToggle from "../components/ThemeToggle";
 
 export default function AuthLayout() {
   return (
-    <div className="min-h-screen grid lg:grid-cols-2">
+    <div className="min-h-screen grid lg:grid-cols-2 bg-background text-foreground">
+      {/* Theme Toggle — fixed top-right */}
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+
       {/* Visual Side */}
       <div className="hidden lg:flex bg-primary/5 flex-col justify-between p-12 border-r border-border/50 relative overflow-hidden">
         <div className="relative z-10">
