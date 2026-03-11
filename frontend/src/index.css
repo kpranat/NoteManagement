@@ -60,3 +60,138 @@
     -webkit-font-smoothing: antialiased;
   }
 }
+
+/* ─── Global Micro-animations & Polish ─────────────────────────────────────── */
+
+@layer components {
+
+  /* Primary action buttons → lift + glow on hover */
+  .btn-primary,
+  a.bg-primary,
+  button.bg-primary {
+    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+  }
+  .btn-primary:hover,
+  a.bg-primary:hover,
+  button.bg-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px -2px color-mix(in srgb, var(--color-primary) 50%, transparent);
+  }
+  .btn-primary:active,
+  a.bg-primary:active,
+  button.bg-primary:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+  /* All other interactive buttons → subtle scale + shadow */
+  button:not(:disabled),
+  [role="button"] {
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  button:not(:disabled):hover,
+  [role="button"]:hover {
+    transform: translateY(-1px);
+  }
+  button:not(:disabled):active,
+  [role="button"]:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  /* Nav links → smooth color transition */
+  a {
+    transition: color 0.15s ease, opacity 0.15s ease;
+  }
+
+  /* Cards → hover lift with soft shadow */
+  .card-hover,
+  [class*="rounded-xl"][class*="border"],
+  [class*="rounded-2xl"][class*="border"] {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  [class*="rounded-xl"][class*="border"]:hover,
+  [class*="rounded-2xl"][class*="border"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px -6px rgba(0, 0, 0, 0.12);
+  }
+  .dark [class*="rounded-xl"][class*="border"]:hover,
+  .dark [class*="rounded-2xl"][class*="border"]:hover {
+    box-shadow: 0 8px 30px -4px color-mix(in srgb, var(--color-primary) 20%, rgba(0,0,0,0.5));
+  }
+
+  /* Text inputs → glow on focus */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  textarea {
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+  }
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 20%, transparent);
+  }
+
+  /* Sidebar nav links → left-accent slide */
+  nav a {
+    position: relative;
+    transition: color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+  }
+  nav a:hover {
+    transform: translateX(2px);
+  }
+
+  /* Icon buttons (bell, avatar, etc.) → pulse scale */
+  button:has(svg):not(:disabled):hover svg {
+    transform: scale(1.15);
+    transition: transform 0.15s ease;
+  }
+  button svg {
+    transition: transform 0.15s ease;
+  }
+}
+
+/* ─── Keyframe Animations ───────────────────────────────────────────────────── */
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-primary) 0%, transparent); }
+  50%       { box-shadow: 0 0 16px 4px color-mix(in srgb, var(--color-primary) 25%, transparent); }
+}
+
+/* Page-level entrance animation */
+.animate-in {
+  animation: fade-in 0.3s ease both;
+}
+
+/* Sidebar entrance */
+aside nav a {
+  animation: slide-in-left 0.2s ease both;
+}
+aside nav a:nth-child(1)  { animation-delay: 0.03s; }
+aside nav a:nth-child(2)  { animation-delay: 0.06s; }
+aside nav a:nth-child(3)  { animation-delay: 0.09s; }
+aside nav a:nth-child(4)  { animation-delay: 0.12s; }
+aside nav a:nth-child(5)  { animation-delay: 0.15s; }
+aside nav a:nth-child(6)  { animation-delay: 0.18s; }
+aside nav a:nth-child(7)  { animation-delay: 0.21s; }
+
+/* Stat + action cards stagger */  
+.stat-card {
+  animation: fade-in 0.35s ease both;
+}
+
+/* Premium / CTA button persistent soft pulse in dark mode */
+.dark a[href="/subscription"],
+.dark button[data-upgrade] {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
