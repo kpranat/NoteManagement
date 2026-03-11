@@ -32,7 +32,7 @@ export default function AIToolsPanel() {
   };
 
   return (
-    <div className="w-80 border-l border-border bg-card/50 flex flex-col h-full sticky top-16">
+    <div className="dark-glow-card w-80 border-l border-border dark:border-primary/10 bg-card/50 dark:bg-zinc-900/60 flex flex-col h-full sticky top-16">
       <div className="p-4 border-b border-border flex items-center justify-between">
         <h3 className="font-semibold flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-primary" />
@@ -48,14 +48,14 @@ export default function AIToolsPanel() {
           </h4>
           <button 
             onClick={handleGenerateSummary}
-            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm bg-secondary rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors group"
+            className="dark-glow-btn w-full flex items-center gap-3 px-3 py-2.5 text-sm bg-secondary rounded-lg hover:bg-primary hover:text-primary-foreground transition-all group"
           >
             <FileText className="w-4 h-4 text-muted-foreground group-hover:text-primary-foreground transition-colors" />
             Summarize Note
           </button>
           <button 
             onClick={handleExtractKeyPoints}
-            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm bg-secondary rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors group"
+            className="dark-glow-btn w-full flex items-center gap-3 px-3 py-2.5 text-sm bg-secondary rounded-lg hover:bg-primary hover:text-primary-foreground transition-all group"
           >
             <CheckCircle2 className="w-4 h-4 text-muted-foreground group-hover:text-primary-foreground transition-colors" />
             Extract Key Points
@@ -71,14 +71,14 @@ export default function AIToolsPanel() {
           </h4>
           <button 
             onClick={handleGenerateFlashcards}
-            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm bg-secondary rounded-lg hover:bg-blue-500 hover:text-white transition-colors group"
+            className="dark-glow-btn dark-glow-btn-blue w-full flex items-center gap-3 px-3 py-2.5 text-sm bg-secondary rounded-lg hover:bg-blue-500 hover:text-white transition-all group"
           >
             <Zap className="w-4 h-4 text-blue-500 group-hover:text-white transition-colors" />
             Generate Flashcards
           </button>
           <button 
             onClick={handleGenerateQuiz}
-            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm bg-secondary rounded-lg hover:bg-blue-500 hover:text-white transition-colors group"
+            className="dark-glow-btn dark-glow-btn-blue w-full flex items-center gap-3 px-3 py-2.5 text-sm bg-secondary rounded-lg hover:bg-blue-500 hover:text-white transition-all group"
           >
             <CheckCircle2 className="w-4 h-4 text-blue-500 group-hover:text-white transition-colors" />
             Generate Quiz
@@ -94,14 +94,14 @@ export default function AIToolsPanel() {
           </h4>
           <button 
             onClick={handleRewriteNote}
-            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm bg-secondary rounded-lg hover:bg-purple-500 hover:text-white transition-colors group"
+            className="dark-glow-btn dark-glow-btn-purple w-full flex items-center gap-3 px-3 py-2.5 text-sm bg-secondary rounded-lg hover:bg-purple-500 hover:text-white transition-all group"
           >
             <RefreshCw className="w-4 h-4 text-purple-500 group-hover:text-white transition-colors" />
             Rewrite & Improve
           </button>
           <button 
             onClick={handleTransformNote}
-            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm bg-secondary rounded-lg hover:bg-purple-500 hover:text-white transition-colors group"
+            className="dark-glow-btn dark-glow-btn-purple w-full flex items-center gap-3 px-3 py-2.5 text-sm bg-secondary rounded-lg hover:bg-purple-500 hover:text-white transition-all group"
           >
             <Sparkles className="w-4 h-4 text-purple-500 group-hover:text-white transition-colors" />
             Transform Note

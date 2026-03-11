@@ -70,7 +70,7 @@ export default function Sidebar() {
 
         {/* Recent Notes */}
         <div>
-          <h4 className="px-3 text-xs font-extrabold text-zinc-700 uppercase tracking-widest mb-2">
+          <h4 className="px-3 text-xs font-extrabold text-zinc-700 dark:text-zinc-200 uppercase tracking-widest mb-2">
             Recent Notes
           </h4>
           <div className="space-y-1">
@@ -78,7 +78,7 @@ export default function Sidebar() {
               <NavLink
                 key={note.id}
                 to={`/notes/${note.id}`}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-zinc-800 font-semibold hover:bg-secondary hover:text-foreground transition-colors truncate"
+                className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-zinc-800 dark:text-zinc-100 font-semibold hover:bg-secondary hover:text-foreground transition-colors truncate"
               >
                 <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
                 <span className="truncate">{note.title}</span>
