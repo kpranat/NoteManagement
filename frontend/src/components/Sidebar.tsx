@@ -37,10 +37,10 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 border-r border-border bg-card flex flex-col h-full flex-shrink-0">
+    <aside className="w-64 border-r border-border bg-background flex flex-col h-full flex-shrink-0">
       {/* Brand */}
       <div className="h-16 flex items-center px-6 border-b border-border">
-        <div className="flex items-center gap-2 font-bold text-lg tracking-tight text-primary">
+        <div className="flex items-center gap-2 font-bold text-lg tracking-tight text-zinc-900 dark:text-primary">
           <div className="w-6 h-6 rounded bg-primary flex items-center justify-center text-primary-foreground">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
           </div>

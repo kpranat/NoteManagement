@@ -4,7 +4,7 @@ import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
   return (
-    <header className="h-16 flex-shrink-0 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center px-6 justify-between sticky top-0 z-10 w-full">
+    <header className="h-16 flex-shrink-0 border-b border-border bg-background flex items-center px-6 justify-between sticky top-0 z-10 w-full">
       
       {/* Search Bar */}
       <div className="flex-1 max-w-md">
