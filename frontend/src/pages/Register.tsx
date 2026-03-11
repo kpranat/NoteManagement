@@ -128,12 +128,18 @@ export default function Register() {
         </button>
       </form>
 
-      <div className="px-8 text-center text-sm text-muted-foreground">
-        Already have an account?{" "}
-        <Link to="/login" className="hover:text-primary underline underline-offset-4 font-medium transition-colors">
-          Sign in
-        </Link>
+      <div className="relative flex items-center gap-3">
+        <div className="flex-1 h-px bg-border" />
+        <span className="text-xs text-muted-foreground uppercase tracking-wider">or</span>
+        <div className="flex-1 h-px bg-border" />
       </div>
+
+      <Link
+        to="/login"
+        className="inline-flex items-center justify-center w-full h-10 px-4 rounded-md border border-border bg-transparent text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground hover:border-primary/40 transition-all"
+      >
+        Already have an account? &nbsp;<span className="text-primary font-semibold">Click to sign in</span>
+      </Link>
     </div>
   );
 }
