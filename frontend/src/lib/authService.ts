@@ -1,5 +1,4 @@
-// API base URL - update this to match your backend URL
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import { API_BASE_URL } from './config';
 
 export interface User {
   id: string;
