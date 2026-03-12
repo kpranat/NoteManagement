@@ -10,7 +10,7 @@
  * - Falls back to localhost for development
  */
 export const getApiBaseUrl = (): string => {
-  let apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+  let apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
   
   // Remove trailing slash if present
   apiUrl = apiUrl.replace(/\/$/, '');

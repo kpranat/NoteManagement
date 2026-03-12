@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { API_BASE_URL } from "@/lib/config";
 import {
   Users,
   ShieldCheck,
@@ -49,7 +50,6 @@ export default function AdminUsers() {
 
     try {
       const token = localStorage.getItem("authToken");
-      const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
       const response = await fetch(
         `${API_BASE_URL}/admin/users?page=${page}&per_page=${perPage}`,
@@ -88,7 +88,6 @@ export default function AdminUsers() {
 
     try {
       const token = localStorage.getItem("authToken");
-      const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
       const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/role`, {
         method: "PUT",

@@ -12,20 +12,18 @@ def create_app():
     db.init_app(app)
     
     # Enable CORS with simple configuration
-    CORS(app, resources={
-        r"/*": {
-            "origins": [
-                "http://localhost:5173", 
-                "http://127.0.0.1:5173",
-                "https://note-management-zeta.vercel.app",
-                # Allow all Vercel preview deployments with regex pattern
-                r"https://.*\.vercel\.app"
-            ],
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"],
-            "supports_credentials": True
-        }
-    }, automatic_options=True, supports_credentials=True)
+    # For Vercel deployments, use origin_regex to match all Vercel domains
+    CORS(app, 
+         origins=[
+             "http://localhost:5173", 
+             "http://127.0.0.1:5173",
+             "https://note-management-zeta.vercel.app"
+         ],
+         origin_regex=r"https://.*\.vercel\.app",
+         methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+         allow_headers=["Content-Type", "Authorization"],
+         supports_credentials=True,
+         automatic_options=True)
     
     # Import models before creating tables
     from app import models

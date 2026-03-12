@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { API_BASE_URL } from "@/lib/config";
 import { 
   ShieldCheck, 
   Users, 
@@ -64,7 +65,6 @@ export default function Admin() {
 
     try {
       const token = localStorage.getItem("authToken");
-      const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
       // Fetch user count
       const userCountResponse = await fetch(`${API_BASE_URL}/admin/users/count`, {
