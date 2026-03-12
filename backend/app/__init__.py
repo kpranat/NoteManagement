@@ -40,9 +40,11 @@ def create_app():
     # Import models before creating tables
     from app import models
     
-    # Create tables
-    with app.app_context():
-        db.create_all()
+    # Only create tables if explicitly requested (not in serverless environment)
+    # For Vercel deployment, tables should be created via migration script
+    # Uncomment below for local development initial setup:
+    # with app.app_context():
+    #     db.create_all()
     
     # Register blueprints
     from app.auth import auth_bp

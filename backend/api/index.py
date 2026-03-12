@@ -1,6 +1,33 @@
+import os
+import sys
 from app import create_app
 
-# Create the Flask app instance for Vercel
-app = create_app()
+# Add error handling for serverless environment
+try:
+    # Create the Flask app instance for Vercel
+    app = create_app()
+    
+    # Debug logging (will appear in Vercel logs)
+    print("Flask app created successfully", file=sys.stderr)
+    print(f"Database URL configured: {'Yes' if os.getenv('DATABASE_URL') else 'No'}", file=sys.stderr)
+    print(f"JWT Secret configured: {'Yes' if os.getenv('JWT_SECRET_KEY') else 'No'}", file=sys.stderr)
+    
+except Exception as e:
+    print(f"Error creating Flask app: {str(e)}", file=sys.stderr)
+    import traceback
+    traceback.print_exc(file=sys.stderr)
+    
+    # Create a minimal error app
+    from flask import Flask, jsonify
+    app = Flask(__name__)
+    
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def catch_all(path):
+        return jsonify({
+            'error': 'Application initialization failed',
+            'message': str(e),
+            'hint': 'Check Vercel logs and environment variables'
+        }), 500
 
 # Vercel will use this app instance
