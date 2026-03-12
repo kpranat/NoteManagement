@@ -2,7 +2,6 @@ from flask import Flask, request
 from flask_cors import CORS
 from app.config import Config
 from app.extensions import db
-import os
 
 def create_app():
     """Create and configure the Flask application"""
@@ -57,26 +56,11 @@ def create_app():
     
     @app.route('/api/health', methods=['GET'])
     def health_check():
-        """Enhanced health check with diagnostics"""
-        status = {
+        """Health check endpoint"""
+        return {
             'status': 'ok',
-            'message': 'Server is running',
-            'environment': {
-                'database_url_configured': bool(Config.SQLALCHEMY_DATABASE_URI and Config.SQLALCHEMY_DATABASE_URI != 'sqlite:///fallback.db'),
-                'jwt_secret_configured': bool(Config.JWT_SECRET_KEY and Config.JWT_SECRET_KEY != 'your-secret-key-change-in-production'),
-                'groq_configured': bool(os.getenv('GROQ_API_KEY'))
-            }
-        }
-        
-        # Try database connection
-        try:
-            db.engine.connect()
-            status['database'] = 'connected'
-        except Exception as e:
-            status['database'] = f'error: {str(e)}'
-            status['status'] = 'degraded'
-        
-        return status, 200 if status['status'] == 'ok' else 503
+            'message': 'Server is running'
+        }, 200
     
     @app.route('/', methods=['GET'])
     def root():
@@ -90,34 +74,18 @@ def create_app():
     
     @app.errorhandler(404)
     def not_found(e):
-        """Handle 404 errors with proper CORS headers"""
-        # List registered routes for debugging
-        routes = []
-        for rule in app.url_map.iter_rules():
-            routes.append(f"{rule.rule} [{', '.join(rule.methods - {'HEAD', 'OPTIONS'})}]")
-        
+        """Handle 404 errors"""
         return {
             'error': 'Not Found',
-            'message': f'The requested URL was not found on the server.',
-            'requested_path': request.path,
-            'available_routes': routes if app.debug else None
+            'message': 'The requested URL was not found on the server.'
         }, 404
     
     @app.errorhandler(500)
     def internal_error(e):
-        """Handle 500 errors with proper CORS headers"""
+        """Handle 500 errors"""
         return {
             'error': 'Internal Server Error',
             'message': 'An internal server error occurred.'
         }, 500
-    
-    # Log registered routes on startup
-    print("=" * 60)
-    print("Registered Routes:")
-    for rule in app.url_map.iter_rules():
-        if rule.endpoint != 'static':
-            methods = ', '.join(rule.methods - {'HEAD', 'OPTIONS'})
-            print(f"  {rule.rule:50s} [{methods}]")
-    print("=" * 60)
     
     return app
