@@ -1,4 +1,4 @@
-import { Search, Bell, Sparkles, LogOut, User as UserIcon, Settings, ShieldCheck } from "lucide-react";
+import { Search, Bell, Sparkles, LogOut, Settings, ShieldCheck } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import ThemeToggle from "./ThemeToggle";
