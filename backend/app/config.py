@@ -29,11 +29,3 @@ class Config:
     JWT_ALGORITHM = 'HS256'
     JWT_EXPIRATION_HOURS = 24
     FLASK_ENV = os.getenv('FLASK_ENV', 'production')
-    
-    # CORS Configuration
-    CORS_ORIGINS = [
-        'http://localhost:5173',
-        'http://localhost:3000',
-        'https://note-management-zeta.vercel.app',
-    ]
-    CORS_SUPPORTS_CREDENTIALS = True

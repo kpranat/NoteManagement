@@ -2,24 +2,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from app.config import Config
 from app.extensions import db
-import re
 import os
-
-def is_allowed_origin(origin):
-    """Check if the origin is allowed (production, preview, or localhost)"""
-    if not origin:
-        return False
-    
-    # Allow configured origins
-    if origin in Config.CORS_ORIGINS:
-        return True
-    
-    # Allow Vercel preview deployments (e.g., note-management-git-*.vercel.app)
-    vercel_preview_pattern = r'^https://note-management-[a-zA-Z0-9-]+\.vercel\.app$'
-    if re.match(vercel_preview_pattern, origin):
-        return True
-    
-    return False
 
 def create_app():
     """Create and configure the Flask application"""
@@ -29,17 +12,21 @@ def create_app():
     # Initialize extensions
     db.init_app(app)
     
-    # Enable CORS with dynamic origin validation
-    # This will handle CORS for all requests, including errors
-    cors = CORS(app, 
-         resources={r"/*": {
-             "origins": is_allowed_origin,
-             "supports_credentials": Config.CORS_SUPPORTS_CREDENTIALS,
-             "allow_headers": ["Content-Type", "Authorization"],
-             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-             "expose_headers": ["Content-Type", "Authorization"],
-             "max_age": 600
-         }})
+    # Enable CORS with simple configuration
+    CORS(app, resources={
+        r"/*": {
+            "origins": [
+                "http://localhost:5173", 
+                "http://127.0.0.1:5173",
+                "https://note-management-zeta.vercel.app",
+                # Allow all Vercel preview deployments with regex pattern
+                r"https://.*\.vercel\.app"
+            ],
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True
+        }
+    }, automatic_options=True, supports_credentials=True)
     
     # Import models before creating tables
     from app import models
