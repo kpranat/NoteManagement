@@ -11,7 +11,11 @@ from groq import Groq
 
 # Initialize Groq client
 GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
-groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
+try:
+    groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
+except Exception as e:
+    print(f"Warning: Failed to initialize Groq client: {str(e)}")
+    groq_client = None
 
 # Daily AI request limit for premium users
 DAILY_AI_LIMIT = 45
