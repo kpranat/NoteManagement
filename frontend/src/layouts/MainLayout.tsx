@@ -4,6 +4,7 @@ import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import StarField from "../components/StarField";
 import LightGradient from "../components/LightGradient";
+import ProtectedRoute from "../components/ProtectedRoute";
 
 export default function MainLayout() {
   const [isDark, setIsDark] = useState(
@@ -19,25 +20,27 @@ export default function MainLayout() {
   }, []);
 
   return (
-    <div className="h-screen flex overflow-hidden bg-background text-foreground relative">
-      {/* Animated backgrounds */}
-      {isDark  && <StarField />}
-      {!isDark && <LightGradient />}
+    <ProtectedRoute>
+      <div className="h-screen flex overflow-hidden bg-background text-foreground relative">
+        {/* Animated backgrounds */}
+        {isDark  && <StarField />}
+        {!isDark && <LightGradient />}
 
-      {/* Sidebar Navigation */}
-      <Sidebar />
-      
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden relative z-10">
-        <Navbar />
+        {/* Sidebar Navigation */}
+        <Sidebar />
         
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto">
-          <main className="w-full max-w-[1200px] mx-auto px-6 py-8">
-            <Outlet />
-          </main>
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col h-full overflow-hidden relative z-10">
+          <Navbar />
+          
+          {/* Scrollable Content */}
+          <div className="flex-1 overflow-y-auto">
+            <main className="w-full max-w-[1200px] mx-auto px-6 py-8">
+              <Outlet />
+            </main>
+          </div>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

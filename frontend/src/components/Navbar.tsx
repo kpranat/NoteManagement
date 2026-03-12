@@ -1,8 +1,32 @@
-import { Search, Bell, Sparkles } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Search, Bell, Sparkles, LogOut, User as UserIcon, Settings } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
 import ThemeToggle from "./ThemeToggle";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Navbar() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <header className="h-16 flex-shrink-0 border-b border-border bg-background flex items-center px-6 justify-between sticky top-0 z-10 w-full">
       
@@ -44,14 +68,48 @@ export default function Navbar() {
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-destructive" />
         </button>
 
-        <button className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-sm font-medium overflow-hidden border border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-within:ring-offset-2">
-          {/* User avatar dropdown later */}
-          <img 
-            src={`https://api.dicebear.com/7.x/notionists/svg?seed=John&backgroundColor=f4f4f5`} 
-            alt="User avatar"
-            className="w-full h-full object-cover"
-          />
-        </button>
+        {/* User Menu */}
+        <div className="relative" ref={menuRef}>
+          <button
+            onClick={() => setShowUserMenu(!showUserMenu)}
+            className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-sm font-medium overflow-hidden border border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring hover:ring-2 hover:ring-ring transition-all"
+          >
+            <img 
+              src={`https://api.dicebear.com/7.x/notionists/svg?seed=${user?.username || 'User'}&backgroundColor=f4f4f5`} 
+              alt="User avatar"
+              className="w-full h-full object-cover"
+            />
+          </button>
+
+          {/* Dropdown Menu */}
+          {showUserMenu && (
+            <div className="absolute right-0 mt-2 w-56 rounded-lg border border-border bg-popover shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="px-4 py-3 border-b border-border">
+                <p className="text-sm font-medium">{user?.username}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+              </div>
+              
+              <div className="py-2">
+                <Link
+                  to="/settings"
+                  className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-secondary transition-colors"
+                  onClick={() => setShowUserMenu(false)}
+                >
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </Link>
+                
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-destructive/10 hover:text-destructive transition-colors w-full text-left"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Log out
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </header>
   );
