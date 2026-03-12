@@ -30,24 +30,16 @@ def create_app():
     db.init_app(app)
     
     # Enable CORS with dynamic origin validation
-    CORS(app, 
-         resources={r"/*": {  # Changed from /api/* to /* to catch all routes
+    # This will handle CORS for all requests, including errors
+    cors = CORS(app, 
+         resources={r"/*": {
              "origins": is_allowed_origin,
              "supports_credentials": Config.CORS_SUPPORTS_CREDENTIALS,
              "allow_headers": ["Content-Type", "Authorization"],
-             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+             "expose_headers": ["Content-Type", "Authorization"],
+             "max_age": 600
          }})
-    
-    # Add CORS headers to error responses
-    @app.after_request
-    def after_request(response):
-        origin = request.headers.get('Origin')
-        if origin and is_allowed_origin(origin):
-            response.headers.add('Access-Control-Allow-Origin', origin)
-            response.headers.add('Access-Control-Allow-Credentials', 'true')
-            response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-            response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
-        return response
     
     # Import models before creating tables
     from app import models
@@ -131,19 +123,6 @@ def create_app():
             'error': 'Internal Server Error',
             'message': 'An internal server error occurred.'
         }, 500
-    
-    # Handle OPTIONS requests globally for CORS preflight
-    @app.before_request
-    def handle_preflight():
-        if request.method == "OPTIONS":
-            response = app.make_default_options_response()
-            origin = request.headers.get('Origin')
-            if origin and is_allowed_origin(origin):
-                response.headers['Access-Control-Allow-Origin'] = origin
-                response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-                response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-                response.headers['Access-Control-Allow-Credentials'] = 'true'
-            return response
     
     # Log registered routes on startup
     print("=" * 60)
