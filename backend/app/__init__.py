@@ -24,8 +24,12 @@ def create_app():
     # Register blueprints
     from app.auth import auth_bp
     from app.notes import notes_bp
+    from app.subscription import subscription_bp
+    from app.ai import ai_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(notes_bp)
+    app.register_blueprint(subscription_bp)
+    app.register_blueprint(ai_bp)
     
     @app.route('/api/health', methods=['GET'])
     def health_check():

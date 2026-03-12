@@ -69,6 +69,9 @@ def generate_auth_token(user):
         'user_id': user.id,
         'email': user.email,
         'username': user.username,
+        'subscription_plan': user.subscription_plan,
+        'subscription_status': user.subscription_status,
+        'has_active_premium': user.has_active_premium(),
         'exp': datetime.utcnow() + timedelta(hours=Config.JWT_EXPIRATION_HOURS),
         'iat': datetime.utcnow()
     }

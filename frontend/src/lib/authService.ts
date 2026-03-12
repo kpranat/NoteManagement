@@ -5,6 +5,10 @@ export interface User {
   id: string;
   email: string;
   username: string;
+  subscription_plan: string;
+  subscription_status: string;
+  subscribed_at?: string | null;
+  subscription_expires_at?: string | null;
   created_at?: string;
 }
 
