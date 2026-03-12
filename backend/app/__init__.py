@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 from app.config import Config
 from app.extensions import db
@@ -31,12 +31,23 @@ def create_app():
     
     # Enable CORS with dynamic origin validation
     CORS(app, 
-         resources={r"/api/*": {
+         resources={r"/*": {  # Changed from /api/* to /* to catch all routes
              "origins": is_allowed_origin,
              "supports_credentials": Config.CORS_SUPPORTS_CREDENTIALS,
              "allow_headers": ["Content-Type", "Authorization"],
              "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
          }})
+    
+    # Add CORS headers to error responses
+    @app.after_request
+    def after_request(response):
+        origin = request.headers.get('Origin')
+        if origin and is_allowed_origin(origin):
+            response.headers.add('Access-Control-Allow-Origin', origin)
+            response.headers.add('Access-Control-Allow-Credentials', 'true')
+            response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+            response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
+        return response
     
     # Import models before creating tables
     from app import models
@@ -97,5 +108,50 @@ def create_app():
             'health': '/api/health',
             'docs': 'See README.md for API documentation'
         }, 200
+    
+    @app.errorhandler(404)
+    def not_found(e):
+        """Handle 404 errors with proper CORS headers"""
+        # List registered routes for debugging
+        routes = []
+        for rule in app.url_map.iter_rules():
+            routes.append(f"{rule.rule} [{', '.join(rule.methods - {'HEAD', 'OPTIONS'})}]")
+        
+        return {
+            'error': 'Not Found',
+            'message': f'The requested URL was not found on the server.',
+            'requested_path': request.path,
+            'available_routes': routes if app.debug else None
+        }, 404
+    
+    @app.errorhandler(500)
+    def internal_error(e):
+        """Handle 500 errors with proper CORS headers"""
+        return {
+            'error': 'Internal Server Error',
+            'message': 'An internal server error occurred.'
+        }, 500
+    
+    # Handle OPTIONS requests globally for CORS preflight
+    @app.before_request
+    def handle_preflight():
+        if request.method == "OPTIONS":
+            response = app.make_default_options_response()
+            origin = request.headers.get('Origin')
+            if origin and is_allowed_origin(origin):
+                response.headers['Access-Control-Allow-Origin'] = origin
+                response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+                response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+                response.headers['Access-Control-Allow-Credentials'] = 'true'
+            return response
+    
+    # Log registered routes on startup
+    print("=" * 60)
+    print("Registered Routes:")
+    for rule in app.url_map.iter_rules():
+        if rule.endpoint != 'static':
+            methods = ', '.join(rule.methods - {'HEAD', 'OPTIONS'})
+            print(f"  {rule.rule:50s} [{methods}]")
+    print("=" * 60)
     
     return app
