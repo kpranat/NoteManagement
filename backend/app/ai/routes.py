@@ -11,11 +11,19 @@ from groq import Groq
 
 # Initialize Groq client
 GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
-try:
-    groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
-except Exception as e:
-    print(f"Warning: Failed to initialize Groq client: {str(e)}")
-    groq_client = None
+groq_client = None
+groq_init_error = None
+
+if GROQ_API_KEY:
+    try:
+        groq_client = Groq(api_key=GROQ_API_KEY)
+        print("✓ Groq AI client initialized successfully")
+    except Exception as e:
+        groq_init_error = str(e)
+        print(f"✗ Failed to initialize Groq client: {groq_init_error}")
+else:
+    groq_init_error = "GROQ_API_KEY environment variable not set"
+    print(f"✗ {groq_init_error}")
 
 # Daily AI request limit for premium users
 DAILY_AI_LIMIT = 45
@@ -73,7 +81,9 @@ def track_ai_usage(user_id, request_type):
 def call_groq_api(prompt, system_prompt="You are a helpful AI assistant for note-taking and productivity."):
     """Call Groq API with the given prompt"""
     if not groq_client:
-        raise Exception("Groq API key not configured")
+        error_msg = groq_init_error or "AI service not available"
+        print(f"❌ AI service unavailable: {error_msg}")
+        raise Exception(f"AI service not configured. Please set GROQ_API_KEY environment variable in Vercel dashboard.")
     
     try:
         chat_completion = groq_client.chat.completions.create(
@@ -140,6 +150,17 @@ def clean_ai_response(text):
 
 
 # ==================== AI Feature Routes (Premium Only) ====================
+
+@ai_bp.route('/health', methods=['GET'])
+def ai_health_check():
+    """Check if AI service is configured and available"""
+    return jsonify({
+        'status': 'ok' if groq_client else 'unavailable',
+        'configured': groq_client is not None,
+        'error': groq_init_error if not groq_client else None,
+        'message': 'AI service is ready' if groq_client else 'AI service not configured. Please set GROQ_API_KEY environment variable.'
+    }), 200 if groq_client else 503
+
 
 @ai_bp.route('/usage', methods=['GET'])
 @token_required

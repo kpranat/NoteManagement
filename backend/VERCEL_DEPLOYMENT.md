@@ -30,13 +30,15 @@ Go to your Vercel project dashboard → Settings → Environment Variables and a
 ```
 DATABASE_URL=your_postgres_connection_string
 JWT_SECRET_KEY=your_secure_random_secret_key
-GROQ_API_KEY=your_groq_api_key (if using AI features)
+GROQ_API_KEY=your_groq_api_key (REQUIRED for AI features - get from console.groq.com)
 ```
 
 **Important**: 
 - Get your DATABASE_URL from your Postgres provider (Vercel Postgres, Supabase, etc.)
 - Generate a secure JWT_SECRET_KEY (at least 32 random characters)
+- Get GROQ_API_KEY from [console.groq.com](https://console.groq.com) (required for AI features)
 - These must be set for all environments (Production, Preview, Development)
+- After adding variables, **redeploy** the application
 
 ### 2. Initialize Database Tables
 
@@ -88,8 +90,10 @@ Or trigger a redeploy in Vercel dashboard.
 ### 4. Verify Deployment
 
 Check these endpoints:
+- `https://your-vercel-url/` - Should return API information
 - `https://your-vercel-url/api/health` - Should return `{"status": "ok"}`
-- Check Vercel logs for any initialization errors
+- `https://your-vercel-url/api/ai/health` - Should return `{"status": "ok", "configured": true}` (if GROQ_API_KEY is set)
+- Check Vercel logs for any initialization errors (look for ✓ or ✗ symbols)
 
 ## Common Issues & Solutions
 
