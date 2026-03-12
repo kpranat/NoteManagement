@@ -13,6 +13,9 @@ import MyNotes from './pages/MyNotes';
 import Insights from './pages/Insights';
 import Subscription from './pages/Subscription';
 import Settings from './pages/Settings';
+import Admin from './pages/Admin';
+import AdminNotes from './pages/AdminNotes';
+import AdminUsers from './pages/AdminUsers';
 
 function App() {
   return (
@@ -37,6 +40,9 @@ function App() {
           <Route path="/insights" element={<Insights />} />
           <Route path="/subscription" element={<Subscription />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/notes" element={<AdminNotes />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
         </Route>
       </Routes>
     </Router>

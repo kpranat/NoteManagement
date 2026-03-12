@@ -1,11 +1,11 @@
-import { Search, Bell, Sparkles, LogOut, User as UserIcon, Settings } from "lucide-react";
+import { Search, Bell, Sparkles, LogOut, User as UserIcon, Settings, ShieldCheck } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import ThemeToggle from "./ThemeToggle";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -85,7 +85,15 @@ export default function Navbar() {
           {showUserMenu && (
             <div className="absolute right-0 mt-2 w-56 rounded-lg border border-border bg-popover shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
               <div className="px-4 py-3 border-b border-border">
-                <p className="text-sm font-medium">{user?.username}</p>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-sm font-medium">{user?.username}</p>
+                  {isAdmin && (
+                    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                      <ShieldCheck className="w-3 h-3" />
+                      <span className="text-xs font-semibold">Admin</span>
+                    </div>
+                  )}
+                </div>
                 <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
               </div>
               

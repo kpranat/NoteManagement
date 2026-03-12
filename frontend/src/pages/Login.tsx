@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, Loader2 } from "lucide-react";
+import { Mail, Lock, Loader2, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Login() {
@@ -104,6 +104,25 @@ export default function Login() {
       >
         First time here? &nbsp;<span className="text-primary font-semibold">Click to sign up</span>
       </Link>
+
+      {/* Admin Access Information */}
+      <div className="mt-6 p-4 rounded-lg border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/30">
+        <div className="flex items-start gap-3">
+          <ShieldCheck className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">
+              Admin Access
+            </h3>
+            <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
+              Admin users can login with their credentials to access advanced features including user management, 
+              system statistics, and the ability to manage all notes across the platform.
+            </p>
+            <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 font-medium">
+              Admin access is granted by system administrators only.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -66,6 +66,19 @@ export const subscriptionService = {
 
 // AI Service (Premium features)
 export const aiService = {
+  // Get AI usage statistics
+  getUsage: async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}/ai/usage`,
+        { headers: getAuthHeader() }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || { error: 'Failed to get AI usage' };
+    }
+  },
+
   // Summarize text
   summarize: async (text: string) => {
     try {
@@ -80,59 +93,73 @@ export const aiService = {
     }
   },
 
-  // Enhance content
-  enhance: async (text: string) => {
+  // Extract key points
+  extractKeyPoints: async (text: string) => {
     try {
       const response = await axios.post(
-        `${API_URL}/ai/enhance`,
+        `${API_URL}/ai/extract-key-points`,
         { text },
         { headers: getAuthHeader() }
       );
       return response.data;
     } catch (error: any) {
-      throw error.response?.data || { error: 'Failed to enhance content' };
+      throw error.response?.data || { error: 'Failed to extract key points' };
     }
   },
 
-  // Suggest tags
-  suggestTags: async (text: string) => {
+  // Generate flashcards
+  generateFlashcards: async (text: string) => {
     try {
       const response = await axios.post(
-        `${API_URL}/ai/suggest-tags`,
+        `${API_URL}/ai/generate-flashcards`,
         { text },
         { headers: getAuthHeader() }
       );
       return response.data;
     } catch (error: any) {
-      throw error.response?.data || { error: 'Failed to suggest tags' };
+      throw error.response?.data || { error: 'Failed to generate flashcards' };
     }
   },
 
-  // Sentiment analysis
-  analyzeSentiment: async (text: string) => {
+  // Generate quiz
+  generateQuiz: async (text: string) => {
     try {
       const response = await axios.post(
-        `${API_URL}/ai/sentiment-analysis`,
+        `${API_URL}/ai/generate-quiz`,
         { text },
         { headers: getAuthHeader() }
       );
       return response.data;
     } catch (error: any) {
-      throw error.response?.data || { error: 'Failed to analyze sentiment' };
+      throw error.response?.data || { error: 'Failed to generate quiz' };
     }
   },
 
-  // Generate insights
-  generateInsights: async (noteId: string) => {
+  // Rewrite and improve text
+  rewriteImprove: async (text: string) => {
     try {
       const response = await axios.post(
-        `${API_URL}/ai/generate-insights`,
-        { note_id: noteId },
+        `${API_URL}/ai/rewrite-improve`,
+        { text },
         { headers: getAuthHeader() }
       );
       return response.data;
     } catch (error: any) {
-      throw error.response?.data || { error: 'Failed to generate insights' };
+      throw error.response?.data || { error: 'Failed to rewrite text' };
+    }
+  },
+
+  // Transform note
+  transformNote: async (text: string, transformType: string = 'outline') => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/ai/transform-note`,
+        { text, transform_type: transformType },
+        { headers: getAuthHeader() }
+      );
+      return response.data;
+    } catch (error: any) {
+      throw error.response?.data || { error: 'Failed to transform note' };
     }
   },
 };

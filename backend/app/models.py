@@ -10,6 +10,7 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.Text, nullable=False)
+    role = db.Column(db.String(20), default='user', nullable=False)  # 'user' or 'admin'
     
     # Subscription fields
     subscription_plan = db.Column(db.String(20), default='free', nullable=False)  # 'free' or 'premium'
@@ -26,6 +27,7 @@ class User(db.Model):
             'id': self.id,
             'email': self.email,
             'username': self.username,
+            'role': self.role,
             'subscription_plan': self.subscription_plan,
             'subscription_status': self.subscription_status,
             'subscribed_at': self.subscribed_at.isoformat() if self.subscribed_at else None,
@@ -99,4 +101,31 @@ class AccessLog(db.Model):
             'ip_address': self.ip_address,
             'user_agent': self.user_agent,
             'accessed_at': self.accessed_at.isoformat() if self.accessed_at else None
+        }
+
+
+# ============================== AIUsage Table =====================================
+class AIUsage(db.Model):
+    """AIUsage model - tracks daily AI request usage per user"""
+    __tablename__ = 'ai_usage'
+    
+    id = db.Column(db.String(36), primary_key=True, nullable=False)  # UUID as string
+    user_id = db.Column(db.String(36), db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False)
+    request_type = db.Column(db.String(50), nullable=False)  # summarize, enhance, flashcards, quiz, rewrite, transform
+    request_date = db.Column(db.Date, nullable=False, default=lambda: datetime.now(timezone.utc).date())
+    request_count = db.Column(db.Integer, default=1, nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    
+    # Relationship
+    user = db.relationship('User', backref=db.backref('ai_usage', lazy=True, cascade='all, delete-orphan'))
+    
+    def to_dict(self):
+        """Convert AI usage to dictionary"""
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'request_type': self.request_type,
+            'request_date': self.request_date.isoformat() if self.request_date else None,
+            'request_count': self.request_count,
+            'created_at': self.created_at.isoformat() if self.created_at else None
         }

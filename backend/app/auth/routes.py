@@ -69,6 +69,7 @@ def generate_auth_token(user):
         'user_id': user.id,
         'email': user.email,
         'username': user.username,
+        'role': user.role,
         'subscription_plan': user.subscription_plan,
         'subscription_status': user.subscription_status,
         'has_active_premium': user.has_active_premium(),
@@ -119,6 +120,22 @@ def token_required(f):
             current_user = payload
         except Exception as e:
             return jsonify({'error': 'Token is invalid'}), 401
+        
+        return f(current_user, *args, **kwargs)
+    
+    return decorated
+
+
+def admin_required(f):
+    """Decorator to require admin role for protected routes. Must be used after token_required."""
+    @wraps(f)
+    def decorated(current_user, *args, **kwargs):
+        # Check if user has admin role
+        if current_user.get('role') != 'admin':
+            return jsonify({
+                'error': 'Admin access required',
+                'message': 'You do not have permission to access this resource'
+            }), 403
         
         return f(current_user, *args, **kwargs)
     

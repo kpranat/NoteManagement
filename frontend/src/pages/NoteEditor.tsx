@@ -10,7 +10,8 @@ import {
   Sparkles,
   Zap,
   Check,
-  Loader2
+  Loader2,
+  Copy
 } from "lucide-react";
 import AIToolsPanel from "../components/AIToolsPanel";
 import { notesService } from "../lib/notesService";
@@ -29,6 +30,11 @@ export default function NoteEditor() {
   const [isLoading, setIsLoading] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // AI Output state
+  const [aiResult, setAiResult] = useState<string | null>(null);
+  const [aiResultTitle, setAiResultTitle] = useState<string>("");
+  const [copySuccess, setCopySuccess] = useState(false);
 
   // Study Note specifics
   const [subject, setSubject] = useState("");
@@ -167,6 +173,45 @@ export default function NoteEditor() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete note");
       console.error("Error deleting note:", err);
+    }
+  };
+
+  const handleAiResult = (result: string, title: string) => {
+    setAiResult(result);
+    setAiResultTitle(title);
+    // Scroll to AI output section
+    setTimeout(() => {
+      document.getElementById('ai-output')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+  };
+
+  const copyAiResult = async () => {
+    if (!aiResult) return;
+    
+    try {
+      // Try modern clipboard API first
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(aiResult);
+      } else {
+        // Fallback for older browsers or non-secure contexts
+        const textArea = document.createElement('textarea');
+        textArea.value = aiResult;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+      }
+      
+      // Show success feedback
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy text:', err);
+      alert('Failed to copy text. Please try selecting and copying manually.');
     }
   };
 
@@ -438,13 +483,73 @@ export default function NoteEditor() {
             {renderEditorContent()}
           </div>
 
+          {/* AI Output Section */}
+          {aiResult && (
+            <div id="ai-output" className="border-t border-border/50 px-8 py-6 bg-secondary/20">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <h3 className="text-sm font-semibold text-foreground">{aiResultTitle}</h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={copyAiResult}
+                    className={`flex items-center gap-2 px-3 py-1.5 text-xs rounded-md transition-colors ${
+                      copySuccess 
+                        ? 'bg-green-600 text-white' 
+                        : 'bg-primary text-primary-foreground hover:bg-primary/90'
+                    }`}
+                  >
+                    {copySuccess ? (
+                      <>
+                        <Check className="w-3 h-3" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3" />
+                        Copy
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setAiResult(null)}
+                    className="px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+              <div className="bg-card border border-border rounded-lg p-4 max-h-96 overflow-y-auto custom-scrollbar">
+                <pre className="whitespace-pre-wrap text-sm text-foreground font-sans leading-relaxed">
+                  {aiResult}
+                </pre>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
 
 
       {/* AI Tools Panel (Right Sidebar) */}
       <div className="hidden lg:block">
-        <AIToolsPanel />
+        <AIToolsPanel 
+          noteContent={(() => {
+            // Get content based on note type for AI processing
+            switch (noteType) {
+              case "study":
+                return `Subject: ${subject}\nTopic: ${topic}\n\nKey Concepts:\n${keyConcepts}\n\nDetailed Explanation:\n${detailedExplanation}`;
+              case "todo":
+                return tasks.map((task, idx) => `${idx + 1}. [${task.completed ? 'x' : ' '}] ${task.text} (Priority: ${task.priority})`).join('\n');
+              case "lecture":
+                return segments.map(seg => `[${seg.timestamp}] ${seg.text}`).join('\n\n');
+              default:
+                return content;
+            }
+          })()} 
+          onResult={handleAiResult}
+        />
       </div>
 
     </div>

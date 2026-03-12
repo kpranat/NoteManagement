@@ -7,9 +7,12 @@ import {
   LineChart, 
   CreditCard, 
   Settings, 
-  LogOut 
+  LogOut,
+  ShieldCheck,
+  Users
 } from "lucide-react";
 import { cn } from "../lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 const NAV_ITEMS = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -29,10 +32,10 @@ const RECENT_NOTES = [
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const { user, logout, isAdmin } = useAuth();
 
   const handleLogout = () => {
-    // TODO: Clear authentication token
-    // TODO: Redirect to login
+    logout();
     navigate("/login");
   };
 
@@ -66,6 +69,25 @@ export default function Sidebar() {
               {item.name}
             </NavLink>
           ))}
+          
+          {/* Admin Panel Link - Only visible to admins */}
+          {isAdmin && (
+            <>
+              <div className="h-px bg-border my-2" />
+              <NavLink
+                to="/admin"
+                className={({ isActive }) => cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                  isActive 
+                    ? "bg-blue-500/10 text-blue-600 dark:text-blue-400" 
+                    : "text-muted-foreground hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400"
+                )}
+              >
+                <ShieldCheck className="w-4 h-4" />
+                Admin Panel
+              </NavLink>
+            </>
+          )}
         </nav>
 
         {/* Recent Notes */}
@@ -91,12 +113,27 @@ export default function Sidebar() {
       {/* Bottom Profile & Logout */}
       <div className="p-4 border-t border-border">
         <div className="flex items-center gap-3 px-3 py-2 mb-2">
-          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm">
-            JD
+          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm overflow-hidden">
+            {user?.username ? (
+              <img 
+                src={`https://api.dicebear.com/7.x/notionists/svg?seed=${user.username}&backgroundColor=f4f4f5`} 
+                alt={user.username}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              'U'
+            )}
           </div>
           <div className="flex-1 overflow-hidden">
-            <p className="text-sm font-medium truncate">John Doe</p>
-            <p className="text-xs text-muted-foreground truncate">Free Plan</p>
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-medium truncate">{user?.username || 'User'}</p>
+              {isAdmin && (
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground truncate">
+              {user?.subscription_plan === 'premium' ? 'Premium Plan' : 'Free Plan'}
+            </p>
           </div>
         </div>
         <button

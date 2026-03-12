@@ -2,7 +2,7 @@ from flask import request, jsonify
 from app.notes import notes_bp
 from app.models import Note, User
 from app.extensions import db
-from app.auth.routes import token_required
+from app.auth.routes import token_required, admin_required
 import uuid
 
 
@@ -204,3 +204,98 @@ def delete_note_route(current_user, note_id):
     except Exception as e:
         print(f"Delete note error: {e}")
         return jsonify({'error': 'An error occurred while deleting note'}), 500
+
+
+# ==================== Admin Helper Functions ====================
+
+def get_all_notes_admin():
+    """Get all notes from all users (admin only)"""
+    try:
+        notes = Note.query.order_by(Note.updated_at.desc()).all()
+        return notes
+    except Exception as e:
+        print(f"Error getting all notes: {e}")
+        return []
+
+
+def delete_note_admin(note_id):
+    """Delete any note by ID (admin only)"""
+    try:
+        note = Note.query.filter_by(id=note_id).first()
+        if not note:
+            return False
+        
+        db.session.delete(note)
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error deleting note (admin): {e}")
+        return False
+
+
+# ==================== Admin Routes ====================
+
+@notes_bp.route('/admin/all', methods=['GET'])
+@token_required
+@admin_required
+def get_all_notes_admin_route(current_user):
+    """Get all notes from all users - Admin only"""
+    try:
+        notes = get_all_notes_admin()
+        
+        # Enrich notes with user information
+        notes_with_users = []
+        for note in notes:
+            note_dict = note.to_dict()
+            # Get user info
+            user = User.query.filter_by(id=note.user_id).first()
+            if user:
+                note_dict['user'] = {
+                    'id': user.id,
+                    'username': user.username,
+                    'email': user.email
+                }
+            notes_with_users.append(note_dict)
+        
+        return jsonify({
+            'notes': notes_with_users,
+            'count': len(notes_with_users)
+        }), 200
+        
+    except Exception as e:
+        print(f"Admin get all notes error: {e}")
+        return jsonify({'error': 'An error occurred while fetching notes'}), 500
+
+
+@notes_bp.route('/admin/<note_id>', methods=['DELETE'])
+@token_required
+@admin_required
+def delete_note_admin_route(current_user, note_id):
+    """Delete any note by ID - Admin only"""
+    try:
+        # Get note first to get user info for logging
+        note = Note.query.filter_by(id=note_id).first()
+        if not note:
+            return jsonify({'error': 'Note not found'}), 404
+        
+        note_owner_id = note.user_id
+        note_title = note.title
+        
+        # Delete the note
+        success = delete_note_admin(note_id)
+        
+        if not success:
+            return jsonify({'error': 'Failed to delete note'}), 500
+        
+        print(f"[ADMIN ACTION] Admin {current_user['username']} deleted note '{note_title}' (ID: {note_id}) owned by user {note_owner_id}")
+        
+        return jsonify({
+            'message': 'Note deleted successfully by admin',
+            'note_id': note_id
+        }), 200
+        
+    except Exception as e:
+        print(f"Admin delete note error: {e}")
+        return jsonify({'error': 'An error occurred while deleting note'}), 500
+
