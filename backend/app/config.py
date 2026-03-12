@@ -35,5 +35,6 @@ class Config:
         'http://localhost:5173',
         'http://localhost:3000',
         'https://note-management-zeta.vercel.app',
+        '^https://note-management-[a-zA-Z0-9-]+\.vercel\.app$',
     ]
     CORS_SUPPORTS_CREDENTIALS = True
