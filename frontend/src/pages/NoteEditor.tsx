@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useSearchParams, useNavigate, useParams } from "react-router-dom";
 import { 
   Save, 
   Trash2, 
@@ -9,39 +9,165 @@ import {
   BookOpen, 
   Sparkles,
   Zap,
-  Check
+  Check,
+  Loader2
 } from "lucide-react";
 import AIToolsPanel from "../components/AIToolsPanel";
+import { notesService } from "../lib/notesService";
 
 export default function NoteEditor() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  // Using URL params for note type currently
+  const { id: noteId } = useParams();
   
   const typeParam = searchParams.get("type");
-  const noteType = typeParam || "general";
+  const [noteType, setNoteType] = useState(typeParam || "general");
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [commandOpen, setCommandOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Study Note specifics
+  const [subject, setSubject] = useState("");
+  const [topic, setTopic] = useState("");
+  const [keyConcepts, setKeyConcepts] = useState("");
+  const [detailedExplanation, setDetailedExplanation] = useState("");
 
   // Todo Note specifics
   const [tasks, setTasks] = useState([{ id: 1, text: "First task", completed: false, priority: "normal" }]);
 
   // Lecture Note specifics
   const [segments, setSegments] = useState([{ id: 1, timestamp: "00:00", text: "Introduction" }]);
+  // Fetch note data if editing existing note
+  useEffect(() => {
+    const fetchNote = async () => {
+      if (!noteId) return;
 
-  const handleSave = () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await notesService.getNoteById(noteId);
+        const note = response.note;
+
+        setTitle(note.title);
+
+        // Determine note type from tags
+        const type = note.tags[0]?.toLowerCase() || "general";
+        setNoteType(type);
+
+        // Parse content based on note type
+        try {
+          const parsedContent = JSON.parse(note.content);
+
+          if (type === "study") {
+            setSubject(parsedContent.subject || "");
+            setTopic(parsedContent.topic || "");
+            setKeyConcepts(parsedContent.keyConcepts || "");
+            setDetailedExplanation(parsedContent.detailedExplanation || "");
+          } else if (type === "todo") {
+            setTasks(parsedContent);
+          } else if (type === "lecture") {
+            setSegments(parsedContent);
+          } else {
+            // General note or unknown structure
+            setContent(note.content);
+          }
+        } catch {
+          // Not JSON, treat as plain text
+          setContent(note.content);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load note");
+        console.error("Error loading note:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchNote();
+  }, [noteId]);
+  const handleSave = async () => {
+    if (!title.trim()) {
+      setError("Please enter a title");
+      return;
+    }
+
     setIsSaving(true);
-    // TODO: POST /api/notes (if isNew)
-    // TODO: PUT /api/notes/:id (if not new)
-    setTimeout(() => setIsSaving(false), 800);
+    setError(null);
+
+    try {
+      // Prepare content based on note type
+      let noteContent = "";
+      const tags = [noteType];
+
+      switch (noteType) {
+        case "study":
+          noteContent = JSON.stringify({
+            subject,
+            topic,
+            keyConcepts,
+            detailedExplanation,
+          });
+          break;
+        case "todo":
+          noteContent = JSON.stringify(tasks);
+          break;
+        case "lecture":
+          noteContent = JSON.stringify(segments);
+          break;
+        default:
+          noteContent = content;
+      }
+
+      // Create or update note
+      if (noteId) {
+        // Update existing note
+        await notesService.updateNote(noteId, {
+          title: title.trim(),
+          content: noteContent,
+          tags: tags,
+        });
+      } else {
+        // Create new note
+        await notesService.createNote({
+          title: title.trim(),
+          content: noteContent,
+          tags: tags,
+        });
+      }
+
+      // Navigate back to dashboard on success
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save note");
+      console.error("Error saving note:", err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleDelete = () => {
-    // TODO: DELETE /api/notes/:id
-    navigate("/dashboard");
+  const handleDelete = async () => {
+    if (!noteId) {
+      // For new notes, just go back
+      navigate("/dashboard");
+      return;
+    }
+
+    if (!confirm("Are you sure you want to delete this note?")) {
+      return;
+    }
+
+    try {
+      await notesService.deleteNote(noteId);
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete note");
+      console.error("Error deleting note:", err);
+    }
   };
 
   const renderEditorContent = () => {
@@ -52,11 +178,23 @@ export default function NoteEditor() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Subject</label>
-                <input type="text" className="w-full bg-transparent border-b border-border focus:border-primary outline-none py-2" placeholder="e.g. Database Systems" />
+                <input
+                  type="text"
+                  className="w-full bg-transparent border-b border-border focus:border-primary outline-none py-2"
+                  placeholder="e.g. Database Systems"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Topic</label>
-                <input type="text" className="w-full bg-transparent border-b border-border focus:border-primary outline-none py-2" placeholder="e.g. Normalization" />
+                <input
+                  type="text"
+                  className="w-full bg-transparent border-b border-border focus:border-primary outline-none py-2"
+                  placeholder="e.g. Normalization"
+                  value={topic}
+                  onChange={(e) => setTopic(e.target.value)}
+                />
               </div>
             </div>
             <div className="space-y-2">
@@ -66,11 +204,21 @@ export default function NoteEditor() {
                   <Sparkles className="w-3 h-3" /> Auto-extract
                 </button>
               </label>
-              <textarea className="w-full min-h-[100px] bg-secondary/30 rounded-lg border-transparent focus:border-primary focus:ring-1 focus:ring-primary outline-none p-4 resize-y" placeholder="List the main ideas here..." />
+              <textarea
+                className="w-full min-h-[100px] bg-secondary/30 rounded-lg border-transparent focus:border-primary focus:ring-1 focus:ring-primary outline-none p-4 resize-y"
+                placeholder="List the main ideas here..."
+                value={keyConcepts}
+                onChange={(e) => setKeyConcepts(e.target.value)}
+              />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Detailed Explanation</label>
-              <textarea className="w-full min-h-[200px] bg-secondary/30 rounded-lg border-transparent focus:border-primary focus:ring-1 focus:ring-primary outline-none p-4 resize-y" placeholder="Expand on the concepts..." />
+              <textarea
+                className="w-full min-h-[200px] bg-secondary/30 rounded-lg border-transparent focus:border-primary focus:ring-1 focus:ring-primary outline-none p-4 resize-y"
+                placeholder="Expand on the concepts..."
+                value={detailedExplanation}
+                onChange={(e) => setDetailedExplanation(e.target.value)}
+              />
             </div>
           </div>
         );
@@ -225,6 +373,18 @@ export default function NoteEditor() {
     }
   };
 
+  // Show loading state while fetching note
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[calc(100vh-4rem-2rem)]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading note...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col md:flex-row h-[calc(100vh-4rem-2rem)] shrink-0 gap-6 animate-in fade-in duration-300">
       {/* Note Editor Card */}
@@ -245,6 +405,11 @@ export default function NoteEditor() {
                 placeholder="Note Title"
                 className="w-full text-4xl font-bold bg-transparent outline-none placeholder:text-muted-foreground/40 mt-1 focus:placeholder:text-muted-foreground/20 transition-colors"
               />
+              {error && (
+                <div className="mt-2 text-sm text-red-500 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-md">
+                  {error}
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col items-end gap-2 ml-4 pt-6">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { 
   TerminalSquare, 
@@ -12,17 +12,74 @@ import {
   BarChart,
   ArrowRight
 } from "lucide-react";
-
-const RECENT_NOTES = [
-  { id: 1, title: "Product Requirements Q3", type: "General", lastEdited: "2 hours ago" },
-  { id: 2, title: "DBMS Study Guide", type: "Study", lastEdited: "Yesterday" },
-  { id: 3, title: "Weekly Planning and Goals", type: "Todo", lastEdited: "Yesterday" },
-  { id: 4, title: "Physics 101: Thermodynamics", type: "Lecture", lastEdited: "2 days ago" },
-];
+import { notesService } from "../lib/notesService";
+import type { Note } from "../lib/notesService";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [commandOpen, setCommandOpen] = useState(false);
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchNotes();
+  }, []);
+
+  const fetchNotes = async () => {
+    try {
+      setLoading(true);
+      const response = await notesService.getAllNotes();
+      setNotes(response.notes);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch notes');
+      console.error('Error fetching notes:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get note type from tags
+  const getNoteType = (tags: string[]): string => {
+    if (tags.includes('study')) return 'Study';
+    if (tags.includes('todo')) return 'Todo';
+    if (tags.includes('lecture')) return 'Lecture';
+    return 'General';
+  };
+
+  // Get recent notes (limit to 4)
+  const recentNotes = notes.slice(0, 4);
+
+  // Calculate statistics
+  const totalNotes = notes.length;
+  const now = new Date();
+  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const notesThisWeek = notes.filter(note => new Date(note.created_at) > oneWeekAgo).length;
+  
+  // Count most used type
+  const typeCounts = notes.reduce((acc, note) => {
+    const type = getNoteType(note.tags);
+    acc[type] = (acc[type] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  const mostUsedType = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'None';
+
+  // Format relative time
+  const getRelativeTime = (dateString: string): string => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 60) return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
+    if (diffHours < 24) return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString();
+  };
 
   return (
     <div className="flex flex-col gap-10 pb-12 animate-in fade-in zoom-in-95 duration-300">
@@ -84,7 +141,7 @@ export default function Dashboard() {
           </div>
           <div>
             <p className="text-sm font-medium text-muted-foreground">Total Notes</p>
-            <p className="text-2xl font-bold">124</p>
+            <p className="text-2xl font-bold">{loading ? '...' : totalNotes}</p>
           </div>
         </div>
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex items-center gap-4">
@@ -93,7 +150,7 @@ export default function Dashboard() {
           </div>
           <div>
             <p className="text-sm font-medium text-muted-foreground">Created This Week</p>
-            <p className="text-2xl font-bold">12</p>
+            <p className="text-2xl font-bold">{loading ? '...' : notesThisWeek}</p>
           </div>
         </div>
         <div className="rounded-xl border border-border bg-card p-6 shadow-sm flex items-center gap-4">
@@ -102,7 +159,7 @@ export default function Dashboard() {
           </div>
           <div>
             <p className="text-sm font-medium text-muted-foreground">Most Used Type</p>
-            <p className="text-2xl font-bold text-foreground">Study</p>
+            <p className="text-2xl font-bold text-foreground">{loading ? '...' : mostUsedType}</p>
           </div>
         </div>
       </section>
@@ -198,26 +255,49 @@ export default function Dashboard() {
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* TODO: Fetch notes from backend GET /api/notes */}
-          {RECENT_NOTES.map((note) => (
-            <Link 
-              key={note.id} 
-              to={`/notes/${note.id}`}
-              className="group rounded-xl border border-border bg-card p-5 hover:shadow-md hover:border-primary/50 transition-all flex flex-col justify-between h-40"
-            >
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  {note.type === 'General' && <FileText className="w-4 h-4 text-muted-foreground" />}
-                  {note.type === 'Study' && <BookOpen className="w-4 h-4 text-blue-500" />}
-                  {note.type === 'Todo' && <CheckSquare className="w-4 h-4 text-green-500" />}
-                  {note.type === 'Lecture' && <Clock className="w-4 h-4 text-purple-500" />}
-                  <span className="text-xs font-medium text-muted-foreground bg-secondary px-2 py-0.5 rounded px-1.5 uppercase tracking-wider">{note.type}</span>
-                </div>
-                <h3 className="font-medium leading-tight group-hover:text-primary transition-colors line-clamp-2">{note.title}</h3>
-              </div>
-              <p className="text-xs text-muted-foreground mt-4">{note.lastEdited}</p>
-            </Link>
-          ))}
+          {loading ? (
+            <div className="col-span-full text-center py-8 text-muted-foreground">
+              Loading notes...
+            </div>
+          ) : error ? (
+            <div className="col-span-full text-center py-8 text-red-500">
+              {error}
+            </div>
+          ) : recentNotes.length === 0 ? (
+            <div className="col-span-full text-center py-8">
+              <p className="text-muted-foreground mb-4">No notes yet. Create your first note!</p>
+              <button 
+                onClick={() => navigate('/notes/create')}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                <FileText className="w-4 h-4" />
+                Create Note
+              </button>
+            </div>
+          ) : (
+            recentNotes.map((note) => {
+              const noteType = getNoteType(note.tags);
+              return (
+                <Link 
+                  key={note.id} 
+                  to={`/notes/${note.id}`}
+                  className="group rounded-xl border border-border bg-card p-5 hover:shadow-md hover:border-primary/50 transition-all flex flex-col justify-between h-40"
+                >
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      {noteType === 'General' && <FileText className="w-4 h-4 text-muted-foreground" />}
+                      {noteType === 'Study' && <BookOpen className="w-4 h-4 text-blue-500" />}
+                      {noteType === 'Todo' && <CheckSquare className="w-4 h-4 text-green-500" />}
+                      {noteType === 'Lecture' && <Clock className="w-4 h-4 text-purple-500" />}
+                      <span className="text-xs font-medium text-muted-foreground bg-secondary px-2 py-0.5 rounded px-1.5 uppercase tracking-wider">{noteType}</span>
+                    </div>
+                    <h3 className="font-medium leading-tight group-hover:text-primary transition-colors line-clamp-2">{note.title}</h3>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-4">{getRelativeTime(note.updated_at)}</p>
+                </Link>
+              );
+            })
+          )}
         </div>
       </section>
 
