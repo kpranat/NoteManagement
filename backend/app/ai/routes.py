@@ -5,25 +5,47 @@ from app.auth.routes import token_required
 from app.subscription.routes import premium_required
 from app.extensions import db
 import os
+import sys
+import traceback
 from datetime import datetime, timezone
 import uuid
-from groq import Groq
+
+# Try to import Groq with detailed error handling
+groq_client = None
+groq_init_error = None
+Groq = None
+
+try:
+    from groq import Groq as GroqClient
+    Groq = GroqClient
+    print("✓ Groq module imported successfully", file=sys.stderr)
+except ImportError as e:
+    groq_init_error = f"Failed to import groq module: {str(e)}"
+    print(f"✗ {groq_init_error}", file=sys.stderr)
+    traceback.print_exc(file=sys.stderr)
+except Exception as e:
+    groq_init_error = f"Unexpected error importing groq: {str(e)}"
+    print(f"✗ {groq_init_error}", file=sys.stderr)
+    traceback.print_exc(file=sys.stderr)
 
 # Initialize Groq client
 GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
-groq_client = None
-groq_init_error = None
 
-if GROQ_API_KEY:
+if GROQ_API_KEY and Groq:
     try:
+        print(f"🔧 Attempting to initialize Groq client with API key (length: {len(GROQ_API_KEY)})", file=sys.stderr)
         groq_client = Groq(api_key=GROQ_API_KEY)
-        print("✓ Groq AI client initialized successfully")
+        print("✓ Groq AI client initialized successfully", file=sys.stderr)
     except Exception as e:
-        groq_init_error = str(e)
-        print(f"✗ Failed to initialize Groq client: {groq_init_error}")
-else:
+        groq_init_error = f"Failed to initialize Groq client: {str(e)}"
+        print(f"✗ {groq_init_error}", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
+elif not GROQ_API_KEY:
     groq_init_error = "GROQ_API_KEY environment variable not set"
-    print(f"✗ {groq_init_error}")
+    print(f"✗ {groq_init_error}", file=sys.stderr)
+elif not Groq:
+    groq_init_error = "Groq module not available (import failed)"
+    print(f"✗ {groq_init_error}", file=sys.stderr)
 
 # Daily AI request limit for premium users
 DAILY_AI_LIMIT = 45
@@ -82,10 +104,16 @@ def call_groq_api(prompt, system_prompt="You are a helpful AI assistant for note
     """Call Groq API with the given prompt"""
     if not groq_client:
         error_msg = groq_init_error or "AI service not available"
-        print(f"❌ AI service unavailable: {error_msg}")
-        raise Exception(f"AI service not configured. Please set GROQ_API_KEY environment variable in Vercel dashboard.")
+        print(f"❌ AI service unavailable: {error_msg}", file=sys.stderr)
+        
+        # Provide detailed error message based on the issue
+        if groq_init_error:
+            raise Exception(f"AI service initialization failed: {groq_init_error}")
+        else:
+            raise Exception(f"AI service not configured. Setup: 1) Add GROQ_API_KEY to Vercel environment variables, 2) Redeploy")
     
     try:
+        print(f"🤖 Calling Groq API with model: llama-3.3-70b-versatile", file=sys.stderr)
         chat_completion = groq_client.chat.completions.create(
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -96,9 +124,12 @@ def call_groq_api(prompt, system_prompt="You are a helpful AI assistant for note
             max_tokens=2048,
         )
         
+        print(f"✓ Groq API call successful", file=sys.stderr)
         return chat_completion.choices[0].message.content
     except Exception as e:
-        print(f"Groq API Error: {e}")
+        error_details = f"Groq API Error: {type(e).__name__}: {str(e)}"
+        print(f"❌ {error_details}", file=sys.stderr)
+        traceback.print_exc(file=sys.stderr)
         raise Exception(f"AI service error: {str(e)}")
 
 
@@ -154,11 +185,22 @@ def clean_ai_response(text):
 @ai_bp.route('/health', methods=['GET'])
 def ai_health_check():
     """Check if AI service is configured and available"""
+    api_key_set = bool(GROQ_API_KEY)
+    api_key_length = len(GROQ_API_KEY) if GROQ_API_KEY else 0
+    groq_module_available = Groq is not None
+    
     return jsonify({
         'status': 'ok' if groq_client else 'unavailable',
         'configured': groq_client is not None,
+        'diagnostics': {
+            'groq_module_imported': groq_module_available,
+            'api_key_set': api_key_set,
+            'api_key_length': api_key_length,
+            'client_initialized': groq_client is not None,
+            'python_version': sys.version,
+        },
         'error': groq_init_error if not groq_client else None,
-        'message': 'AI service is ready' if groq_client else 'AI service not configured. Please set GROQ_API_KEY environment variable.'
+        'message': 'AI service is ready' if groq_client else f'AI service not configured. Error: {groq_init_error or "Unknown"}'
     }), 200 if groq_client else 503
 
 
