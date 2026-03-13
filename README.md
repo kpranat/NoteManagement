@@ -1,17 +1,18 @@
-# NoteManagement
+# Note Managemen
+NoteManagement is a smart note-taking app designed to help you stay organized. It features a simple two-tier system: basic notes for everyone, and AI-powered tools for Pro users.
+​Built with React (Frontend), Python/Flask (Backend), and Supabase (Database).
 
-A sophisticated note-taking application featuring AI-powered tools, tiered subscription models, and comprehensive administrative controls. This project is built with a React/TypeScript frontend and a Python/Flask backend, utilizing Supabase for database management.
+## Features
 
-## 🚀 Features
-
-### 🧠 AI-Powered Insights (Premium)
+### 
+AI-Powered Insights (Premium)
 
 Enhance your productivity with integrated AI capabilities designed for premium users:
 
-* **Summarization**: Automatically generate concise summaries of long notes.
-* **Action Items**: Extract actionable tasks directly from your note content.
-* **Key Insights**: Identify the most important points within your documents.
-* **Usage Tracking**: Built-in limits for AI usage based on subscription tiers (e.g., 5 requests for Free users, 100 for Pro).
+* ​Summarize: Instantly turn long notes into  short, readable summaries.
+*​Action Items: Automatically extract a "To-Do" list from your text.
+* ​Key Insights: Quickly identify the most important points.
+*​Daily Limits: Pro users get 45 AI requests per day.
 
 ### 💳 Subscription Management
 
