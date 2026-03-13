@@ -1,4 +1,4 @@
-# Note Managemen
+# Note Management
 NoteManagement is a smart note-taking app designed to help you stay organized. It features a simple two-tier system: basic notes for everyone, and AI-powered tools for Pro users.
 ​Built with React (Frontend), Python/Flask (Backend), and Supabase (Database).
 
