@@ -1,104 +1,182 @@
-# Note Management
-NoteManagement is a smart note-taking app designed to help you stay organized. It features a simple two-tier system: basic notes for everyone, and AI-powered tools for Pro users.
-​Built with React (Frontend), Python/Flask (Backend), and Supabase (Database).
+# NoteManagement
 
-## Features
+**NoteManagement** is a smart note-taking app that helps users write, organize, and understand their notes better.
 
-### 
-AI-Powered Insights (Premium)
+The app has two levels:
 
-Enhance your productivity with integrated AI capabilities designed for premium users:
+- **Free users** can create and manage notes.
+- **Pro users** get AI tools that help summarize notes and extract useful information.
 
-Summarize: Instantly turn long notes into  short, readable summaries.
+The project is built using **React (Frontend), Flask (Backend), and Supabase (Database).**
 
-Action Items: Automatically extract a "To-Do" list from your text.
+---
 
-Key Insights: Quickly identify the most important points.
+#  Features
 
-Daily Limits: Pro users get 45 AI requests per day.
+## Note Management
 
-### 💳 Subscription Management
+Users can easily create and manage notes.
 
-A robust tier system to manage user access and monetization:
+**Features include:**
 
-* **Tiered Access**: Supports Free, Pro, and Enterprise levels.
-* **Feature Gating**: Restricts advanced features like AI tools to higher-tier subscribers.
-* **Usage Quotas**: Dynamically tracks and resets monthly AI usage quotas.
+- Create new notes
+- Edit existing notes
+- Save notes in the cloud
+- Simple and clean interface
 
-### 🛡️ Admin Role-Based Access Control (RBAC)
+---
 
-Dedicated administrative tools for platform management:
+## AI Tools (Pro Users)
 
-* **User Management**: View all registered users and manage their account status.
-* **Note Oversight**: Global visibility into notes across the platform for moderation.
-* **Role Promotion**: Capability to promote standard users to Admin status.
-* **Secure Access**: Protected routes ensuring only authorized personnel can access the Admin Dashboard.
+Pro users get helpful AI tools that make notes easier to understand.
 
-## 🛠️ Tech Stack
+### AI Features
 
-* **Frontend**: React, TypeScript, Vite, Tailwind CSS.
-* **Backend**: Python, Flask, SQLAlchemy.
-* **Database**: Supabase (PostgreSQL).
+**Summarize**
+- Converts long notes into short summaries.
 
-## 🏁 Quick Start
+**Action Items**
+- Finds tasks or to-do items from your notes.
 
-### Prerequisites
+**Key Insights**
+- Shows the most important points from the text.
 
-* Python 3.8+.
-* Node.js 18+ and npm.
-* Supabase Account and Project.
+### Daily Limit
 
-### Backend Setup
+Pro users can use **AI tools up to 45 times per day.**
 
-1. Navigate to the `backend` directory.
-2. Install dependencies:
-```bash
+---
+
+## Subscription System
+
+The platform supports different user plans.
+
+**Available plans:**
+
+- **Free**
+- **Pro**
+- **Enterprise**
+
+The subscription system:
+
+- Controls feature access
+- Tracks AI usage
+- Resets usage limits monthly
+- Allows users to upgrade plans
+
+---
+
+## Admin Dashboard (RBAC)
+
+Admins have special access to manage the platform.
+
+**Admin features include:**
+
+### User Management
+- View all registered users
+- Manage user account status
+
+### Note Monitoring
+- View notes across the platform if required
+
+### Role Management
+- Promote users to Admin
+
+### Secure Access
+- Only authorized admins can access the admin dashboard.
+
+---
+
+# Tech Stack
+
+## Frontend
+- **React**
+- **TypeScript**
+- **Vite**
+- **Tailwind CSS**
+
+## Backend
+- **Python**
+- **Flask**
+- **SQLAlchemy**
+
+## Database
+- **Supabase (PostgreSQL)**
+
+---
+
+# Quick Start
+
+## Prerequisites
+
+You need the following installed:
+
+- **Python 3.8+**
+- **Node.js 18+**
+- **npm**
+- **Supabase account**
+
+---
+
+# Backend Setup
+
+Navigate to the backend folder:
+
+-```bash
+cd backend
+
+-Install dependencies:
+
 pip install -r requirements.txt
 
-```
+-Create a .env file and add:
 
+SUPABASE_URL=your_project_url
+SUPABASE_KEY=your_api_key
 
-3. Configure your environment variables in a `.env` file (see `.env.example` for required keys like `SUPABASE_URL` and `SUPABASE_KEY`).
-4. Run database migrations:
-```bash
+-Run database migrations:
+
 python migrate_subscription.py
 python migrate_role.py
 
-```
+-Start the Flask server:
 
-
-5. Start the Flask server:
-```bash
 python run.py
 
-```
+**Frontend Setup**
 
+-Navigate to the frontend folder:
 
+cd frontend
 
-### Frontend Setup
+-Install dependencies:
 
-1. Navigate to the `frontend` directory.
-2. Install dependencies:
-```bash
 npm install
 
-```
+-Start the development server:
 
-
-3. Start the development server:
-```bash
 npm run dev
 
-```
+
+
+**Future Improvements**
+
+-AI powered smart tagging
+
+-Search inside notes
+
+-Shared notes and collaboration
+
+-Mobile version of the app
+
+-Offline support
 
 
 
-## 📂 Project Structure
+---
 
-* `/backend`: Flask API, database models, and migration scripts.
-* `/frontend`: React application, UI components, and service layers.
-* `/docs`: Detailed feature documentation for AI, Admin, and Subscriptions.
+📄 License
 
-## 📄 License
+This project is licensed under the terms provided in the LICENSE file.
 
-This project is licensed under the terms provided in the [LICENSE](https://www.google.com/search?q=LICENSE) file.
+---
