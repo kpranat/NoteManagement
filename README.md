@@ -9,13 +9,13 @@ AI-Powered Insights (Premium)
 
 Enhance your productivity with integrated AI capabilities designed for premium users:
 
-* ​Summarize: Instantly turn long notes into  short, readable summaries.
+Summarize: Instantly turn long notes into  short, readable summaries.
 
-*​ Action Items: Automatically extract a "To-Do" list from your text.
+Action Items: Automatically extract a "To-Do" list from your text.
 
-* ​Key Insights: Quickly identify the most important points.
+Key Insights: Quickly identify the most important points.
 
-*​ Daily Limits: Pro users get 45 AI requests per day.
+Daily Limits: Pro users get 45 AI requests per day.
 
 ### 💳 Subscription Management
 
